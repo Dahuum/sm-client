@@ -5,8 +5,12 @@ module.exports = {
     "./dist/**/*.{html,js}"
   ],
   theme: {
-    extend: {},
+    container: {
+      center: true, // This will center the container by default
+    },
+    extend: {
+      // Add any custom extensions here if needed
+    },
   },
   plugins: [],
 }
-

@@ -7,9 +7,34 @@
     <title>Document</title>
     <link href="styles.css" rel="stylesheet">
 </head>
+<style>
+    body{
+        background-color: #f0ecff;
+    }
+</style>
 <body>
-    <div class="m-96">
-        <h1 class="m-1"> Hello</h1>
+    <!-- NavBar -->
+    <nav class="fixed top-0 left-1/2 transform -translate-x-1/2  bg-white dark:bg-black  sm:w-3/5 mx-auto shadow-lg rounded-b-md">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between p-4">
+            <div class="flex space-x-4">
+                <img src="https://i.pinimg.com/1200x/9f/f7/73/9ff77355aa9da65684690f04d3ca021a.jpg" class="w-8 h-8 rounded-2xl" alt="Profile pic">
+                <a href="#" class="text-xl font-bold">Dahuum48</a>
+            </div>
+            <!-- Navigation Links (Always Visible) -->
+            <ul class="flex space-x-6 mt-2 md:mt-0">
+                <li><a href="#" class="hover:text-green-500">Home</a></li>
+                <li><a href="#" class="hover:text-green-500">Profile</a></li>
+            </ul>
+            <!-- Buttons -->
+            <div class="flex space-x-1">
+                <button class="bg-transparent hover:bg-green-500 text-green -700 font-semibold hover:text-white py-1 px-3 border border-green-500 hover:border-transparent rounded"> Login</button>
+                <button class="bg-transparent hover:bg-green-500 text-green -700 font-semibold hover:text-white py-1 px-3 border border-green-500 hover:border-transparent rounded"> Signup</button>
+            </div>
+        </div>
+    </nav>
+    <div class="sm:container sm:w-3/5 mx-auto   h-screen ">
+        
     </div>
 </body>
+<script src="./index.js"></script>
 </html>
