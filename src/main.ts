@@ -65,7 +65,7 @@ axios.get(`${baseUrl}/posts`).then((response) => {
 function loginClicked(): void {
   let password = document.querySelector('[data-my-id="pass"]') as HTMLInputElement;
   let email = document.querySelector('[data-my-id="mail"]') as HTMLInputElement;  
-  alert(`${email.value} && ${password.value}`);
+  // alert(`${email.value} && ${password.value}`);
   
   const loginInfo = {
     "username": email.value,
@@ -73,8 +73,32 @@ function loginClicked(): void {
   };
   const url = `${baseUrl}/login`;
   axios.post(url, loginInfo).then((response) => {
-    console.log(response.data);
     let userToken = response.data.token;
-    alert(userToken);
+    localStorage.setItem("token", userToken);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
   })
+}
+
+function LoginMessage(message: string): void {
+  const alertDiv = document.createElement('div');
+  alertDiv.id = 'alert-3';
+  alertDiv.className = 'flex fixed bottom-5 right-5 items-center p-4 m-4 text-green-800 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-green-400';
+  alertDiv.role = 'alert';
+  alertDiv.innerHTML = `
+    <span class="sr-only">Info</span>
+    <div class="ms-3 text-lg font-medium">${message}</div>
+  `
+  alertDiv.style.transition = 'opacity 0.3s ease-in';
+  alertDiv.style.opacity = '0';
+  document.body.append(alertDiv);
+  
+  void alertDiv.offsetWidth;
+  alertDiv.style.opacity = '1';
+  
+  setTimeout(() => {
+    alertDiv.style.opacity = '0';
+    setTimeout(() => {
+      alertDiv.remove();
+    }, 300);
+  }, 2000);
 }
