@@ -1,5 +1,8 @@
+type int = number; /* i think it's better right ? */
+
+const baseUrl: string = "https://tarmeezacademy.com/api/v1";
 let postHtml = document.getElementById("post");
-type int = number;
+
 
 interface Post {
   timeAgo: (string);
@@ -11,7 +14,7 @@ interface Post {
   commentsNum?: (int);
 }
 
-function fillPost(post: Post, data: any){
+function fillPost(post: Post, data: any): void{
   post.timeAgo = data.created_at;
   post.username = data.author.username;
   if (Object.keys(data.author.profile_image).length != 0) post.profilePic = data.author.profile_image;
@@ -24,7 +27,7 @@ function fillPost(post: Post, data: any){
   post.commentsNum = data.comments_count;
 }
 
-axios.get("https://tarmeezacademy.com/api/v1/posts").then((response) => {
+axios.get(`${baseUrl}/posts`).then((response) => {
   const posts = response.data.data;
   
   for (let post of posts) {
@@ -58,3 +61,20 @@ axios.get("https://tarmeezacademy.com/api/v1/posts").then((response) => {
     postHtml.innerHTML += content;
   } 
 });
+
+function loginClicked(): void {
+  let password = document.querySelector('[data-my-id="pass"]') as HTMLInputElement;
+  let email = document.querySelector('[data-my-id="mail"]') as HTMLInputElement;  
+  alert(`${email.value} && ${password.value}`);
+  
+  const loginInfo = {
+    "username": email.value,
+    "password": password.value,
+  };
+  const url = `${baseUrl}/login`;
+  axios.post(url, loginInfo).then((response) => {
+    console.log(response.data);
+    let userToken = response.data.token;
+    alert(userToken);
+  })
+}

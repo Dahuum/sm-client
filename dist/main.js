@@ -1,4 +1,5 @@
 "use strict";
+const baseUrl = "https://tarmeezacademy.com/api/v1";
 let postHtml = document.getElementById("post");
 function fillPost(post, data) {
     post.timeAgo = data.created_at;
@@ -18,7 +19,7 @@ function fillPost(post, data) {
     post.postContent = data.body;
     post.commentsNum = data.comments_count;
 }
-axios.get("https://tarmeezacademy.com/api/v1/posts").then((response) => {
+axios.get(`${baseUrl}/posts`).then((response) => {
     const posts = response.data.data;
     for (let post of posts) {
         let p = {};
@@ -51,3 +52,18 @@ axios.get("https://tarmeezacademy.com/api/v1/posts").then((response) => {
         postHtml.innerHTML += content;
     }
 });
+function loginClicked() {
+    let password = document.querySelector('[data-my-id="pass"]');
+    let email = document.querySelector('[data-my-id="mail"]');
+    alert(`${email.value} && ${password.value}`);
+    const loginInfo = {
+        "username": email.value,
+        "password": password.value,
+    };
+    const url = `${baseUrl}/login`;
+    axios.post(url, loginInfo).then((response) => {
+        console.log(response.data);
+        let userToken = response.data.token;
+        alert(userToken);
+    });
+}
