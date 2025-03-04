@@ -52,20 +52,6 @@ axios.get(`${baseUrl}/posts`).then((response) => {
         postHtml.innerHTML += content;
     }
 });
-function loginClicked() {
-    let password = document.querySelector('[data-my-id="pass"]');
-    let email = document.querySelector('[data-my-id="mail"]');
-    const loginInfo = {
-        "username": email.value,
-        "password": password.value,
-    };
-    const url = `${baseUrl}/login`;
-    axios.post(url, loginInfo).then((response) => {
-        let userToken = response.data.token;
-        localStorage.setItem("token", userToken);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-    });
-}
 function LoginMessage(message) {
     const alertDiv = document.createElement('div');
     alertDiv.id = 'alert-3';
@@ -87,3 +73,38 @@ function LoginMessage(message) {
         }, 300);
     }, 2000);
 }
+function loginClicked() {
+    let password = document.querySelector('[data-my-id="pass"]');
+    let email = document.querySelector('[data-my-id="mail"]');
+    const loginInfo = {
+        "username": email.value,
+        "password": password.value,
+    };
+    let userToken;
+    const url = `${baseUrl}/login`;
+    axios.post(url, loginInfo).then((response) => {
+        userToken = response.data.token;
+        if (userToken) {
+            const login_modal = document.getElementById('authentication-modal');
+            login_modal.style.opacity = '0';
+            LoginMessage("🎉 Login successful! Redirecting...");
+            localStorage.setItem("token", userToken);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+        }
+    })
+        .catch((error) => {
+        LoginMessage("❌ Invalid credentials. Please try again.");
+    });
+}
+function updateUI() {
+    let userToken = localStorage.getItem("token");
+    if (userToken === null) {
+    }
+    else {
+        let loginBtn = document.getElementById("login-btn");
+        let signupBtn = document.getElementById("signup-btn");
+        loginBtn.style.visibility = 'hidden';
+        signupBtn.style.visibility = 'hidden';
+    }
+}
+updateUI();

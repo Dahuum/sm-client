@@ -62,23 +62,6 @@ axios.get(`${baseUrl}/posts`).then((response) => {
   } 
 });
 
-function loginClicked(): void {
-  let password = document.querySelector('[data-my-id="pass"]') as HTMLInputElement;
-  let email = document.querySelector('[data-my-id="mail"]') as HTMLInputElement;  
-  // alert(`${email.value} && ${password.value}`);
-  
-  const loginInfo = {
-    "username": email.value,
-    "password": password.value,
-  };
-  const url = `${baseUrl}/login`;
-  axios.post(url, loginInfo).then((response) => {
-    let userToken = response.data.token;
-    localStorage.setItem("token", userToken);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-  })
-}
-
 function LoginMessage(message: string): void {
   const alertDiv = document.createElement('div');
   alertDiv.id = 'alert-3';
@@ -102,3 +85,49 @@ function LoginMessage(message: string): void {
     }, 300);
   }, 2000);
 }
+
+function loginClicked(): void {
+  let password = document.querySelector('[data-my-id="pass"]') as HTMLInputElement;
+  let email = document.querySelector('[data-my-id="mail"]') as HTMLInputElement;  
+  // alert(`${email.value} && ${password.value}`);
+  
+  const loginInfo = {
+    "username": email.value,
+    "password": password.value,
+  };
+  let userToken: string;
+  const url = `${baseUrl}/login`;
+  axios.post(url, loginInfo).then((response) => {
+    userToken = response.data.token;
+    
+    if (userToken) {
+      const login_modal = document.getElementById('authentication-modal');
+      login_modal.style.opacity = '0';
+      LoginMessage("🎉 Login successful! Redirecting...");
+      localStorage.setItem("token", userToken);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+    }
+  })
+  .catch((error) => {
+    LoginMessage("❌ Invalid credentials. Please try again.");
+  })
+}
+
+function updateUI() {
+  let userToken = localStorage.getItem("token");
+  
+  if (userToken === null)
+  {
+    // console.log("hello")
+  }
+  else 
+  {
+    let loginBtn = document.getElementById("login-btn");
+    let signupBtn = document.getElementById("signup-btn");
+    
+    loginBtn.style.visibility = 'hidden';
+    signupBtn.style.visibility = 'hidden';
+  }
+}
+
+updateUI();
