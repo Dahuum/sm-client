@@ -58,7 +58,7 @@ axios.get(`${baseUrl}/posts`).then((response) => {
       </div>
       <!--// POST //-->
       `;
-    postHtml.innerHTML += content;
+    if (postHtml)postHtml.innerHTML += content;
   } 
 });
 
@@ -86,10 +86,38 @@ function LoginMessage(message: string): void {
   }, 2000);
 }
 
+function updateUI() {
+  let userToken = localStorage.getItem("token");
+  /* buttunat */
+  let loginBtn = document.getElementById("login-btn");
+  let signupBtn = document.getElementById("signup-btn");
+  let logoutBtn = document.getElementById('logout');  
+  
+  if (userToken === null)
+  {
+    if (loginBtn) loginBtn.style.display = 'block';
+    if (signupBtn) signupBtn.style.display = 'block';
+    if (logoutBtn) logoutBtn.style.display = 'none';
+  }
+  else 
+  {
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (signupBtn) signupBtn.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'block';
+  }
+}
+
+function logout() {
+  
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  LoginMessage("👋 Logged out successfully. See you soon!");
+  updateUI();
+}
+
 function loginClicked(): void {
   let password = document.querySelector('[data-my-id="pass"]') as HTMLInputElement;
   let email = document.querySelector('[data-my-id="mail"]') as HTMLInputElement;  
-  // alert(`${email.value} && ${password.value}`);
   
   const loginInfo = {
     "username": email.value,
@@ -101,33 +129,16 @@ function loginClicked(): void {
     userToken = response.data.token;
     
     if (userToken) {
-      const login_modal = document.getElementById('authentication-modal');
-      login_modal.style.opacity = '0';
+      window.location.reload();
       LoginMessage("🎉 Login successful! Redirecting...");
       localStorage.setItem("token", userToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      updateUI();
     }
   })
   .catch((error) => {
     LoginMessage("❌ Invalid credentials. Please try again.");
   })
-}
-
-function updateUI() {
-  let userToken = localStorage.getItem("token");
-  
-  if (userToken === null)
-  {
-    // console.log("hello")
-  }
-  else 
-  {
-    let loginBtn = document.getElementById("login-btn");
-    let signupBtn = document.getElementById("signup-btn");
-    
-    loginBtn.style.visibility = 'hidden';
-    signupBtn.style.visibility = 'hidden';
-  }
 }
 
 updateUI();

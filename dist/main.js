@@ -49,7 +49,8 @@ axios.get(`${baseUrl}/posts`).then((response) => {
       </div>
       <!--// POST //-->
       `;
-        postHtml.innerHTML += content;
+        if (postHtml)
+            postHtml.innerHTML += content;
     }
 });
 function LoginMessage(message) {
@@ -73,6 +74,34 @@ function LoginMessage(message) {
         }, 300);
     }, 2000);
 }
+function updateUI() {
+    let userToken = localStorage.getItem("token");
+    let loginBtn = document.getElementById("login-btn");
+    let signupBtn = document.getElementById("signup-btn");
+    let logoutBtn = document.getElementById('logout');
+    if (userToken === null) {
+        if (loginBtn)
+            loginBtn.style.display = 'block';
+        if (signupBtn)
+            signupBtn.style.display = 'block';
+        if (logoutBtn)
+            logoutBtn.style.display = 'none';
+    }
+    else {
+        if (loginBtn)
+            loginBtn.style.display = 'none';
+        if (signupBtn)
+            signupBtn.style.display = 'none';
+        if (logoutBtn)
+            logoutBtn.style.display = 'block';
+    }
+}
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    LoginMessage("👋 Logged out successfully. See you soon!");
+    updateUI();
+}
 function loginClicked() {
     let password = document.querySelector('[data-my-id="pass"]');
     let email = document.querySelector('[data-my-id="mail"]');
@@ -85,26 +114,15 @@ function loginClicked() {
     axios.post(url, loginInfo).then((response) => {
         userToken = response.data.token;
         if (userToken) {
-            const login_modal = document.getElementById('authentication-modal');
-            login_modal.style.opacity = '0';
+            window.location.reload();
             LoginMessage("🎉 Login successful! Redirecting...");
             localStorage.setItem("token", userToken);
             localStorage.setItem("user", JSON.stringify(response.data.user));
+            updateUI();
         }
     })
         .catch((error) => {
         LoginMessage("❌ Invalid credentials. Please try again.");
     });
-}
-function updateUI() {
-    let userToken = localStorage.getItem("token");
-    if (userToken === null) {
-    }
-    else {
-        let loginBtn = document.getElementById("login-btn");
-        let signupBtn = document.getElementById("signup-btn");
-        loginBtn.style.visibility = 'hidden';
-        signupBtn.style.visibility = 'hidden';
-    }
 }
 updateUI();

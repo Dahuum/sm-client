@@ -37,7 +37,7 @@
                                 <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                                 <input type="password" data-my-id="pass" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
                             </div>
-                            <button type="button" id="submit-button"  onclick="loginClicked()" style="background-color: #047857 !important;" class="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Login to your account</button>
+                            <button type="submit" id="submit-button"  onclick="loginClicked()" style="background-color: #047857 !important;" class="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Login to your account</button>
                         </form>
                     </div>
                 </div>
@@ -82,8 +82,8 @@
     <nav class="fixed top-0 left-1/2 transform -translate-x-1/2  bg-green-50 dark:bg-black  sm:w-3/5 mx-auto shadow-lg rounded-b-md">
         <div class="container mx-auto flex flex-col md:flex-row items-center justify-between p-4">
             <div class="flex space-x-4">
-                <img src="https://i.pinimg.com/1200x/9f/f7/73/9ff77355aa9da65684690f04d3ca021a.jpg" class="w-7 h-7 rounded-2xl" alt="Profile pic">
-                <a href="#" class="text-xl font-bold">Dahuum48</a>
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/013/360/247/small/default-avatar-photo-icon-social-media-profile-sign-symbol-vector.jpg" class="w-7 h-7 rounded-2xl" alt="Profile pic">
+                <a href="#" class="text-xl font-bold">GHEST</a>
             </div>
             <!-- Navigation Links -->
             <ul class="flex space-x-6 mt-2 md:mt-0">
@@ -100,7 +100,7 @@
                 <!--// NO-LOGGED USERS //-->
                 
                 <!-- LOGGED USERS -->
-                <button id="logout" style="background-color: red !important;" type="button" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 border border-red-500 hover:border-red-600 rounded-md shadow-sm transition duration-300 ease-in-out"> Logout</button>
+                <button id="logout" type="submit" onclick="logout()" style="background-color: red !important;" type="button" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 border border-red-500 hover:border-red-600 rounded-md shadow-sm transition duration-300 ease-in-out"> Logout</button>
                 <!--// LOGGED USERS //-->
             </div>
             <!--// Buttons //-->
