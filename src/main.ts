@@ -2,6 +2,8 @@ type int = number; /* i think it's better right ? */
 
 const baseUrl: string = "https://tarmeezacademy.com/api/v1";
 let postHtml = document.getElementById("post");
+let currentPage: int = 1;
+let lastPage: int = 1;
 
 
 interface Post {
@@ -13,6 +15,13 @@ interface Post {
   postContent: (string | int);
   commentsNum?: (int);
 }
+
+/* HANDLE INFINITE SCROLLING */
+window.addEventListener("scroll", function(){
+  const endOfPage = window.innerHeight + Math.round(window.scrollY) >= document.documentElement.scrollHeight - 100; // adding buffer  console.log(endOfPage);
+  if (endOfPage && (currentPage <= lastPage)) showPosts(currentPage++);
+})
+/* // HANDLE INFINITE SCROLLING // */
 
 function fillPost(post: Post, data: any): void{
   post.timeAgo = data.created_at;
@@ -27,10 +36,11 @@ function fillPost(post: Post, data: any): void{
   post.commentsNum = data.comments_count;
 }
 
-function showPosts(): void {
-  axios.get(`${baseUrl}/posts`).then((response) => {
+function showPosts(page: number =1): void {
+  axios.get(`${baseUrl}/posts?limit=4&page=${page}`).then((response) => {
     const posts = response.data.data;
-    
+    lastPage = response.data.meta.last_page;
+    console.log("Last Page: " + lastPage);
     for (let post of posts) {
       let p = {} as Post;
       fillPost(p, post);
@@ -96,13 +106,14 @@ function updateUI(): void {
   let signupBtn = document.getElementById("signup-btn");
   let logoutBtn = document.getElementById('logout');
   let addPostBtn = document.getElementById("addBtn");
-  
+  let navUsername = document.getElementById('nav-username');
   if (userToken === null)
   {
     if (loginBtn) loginBtn.style.display = 'block';
     if (signupBtn) signupBtn.style.display = 'block';
     if (logoutBtn) logoutBtn.style.display = 'none';
     if (addPostBtn) addPostBtn.style.display = 'none';
+    if (navUsername) navUsername.textContent = '@GUEST';
   }
   else 
   {
@@ -110,6 +121,7 @@ function updateUI(): void {
     if (signupBtn) signupBtn.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'block';
     if (addPostBtn) addPostBtn.style.display = 'block';
+    if (navUsername) navUsername.textContent = `@${localStorage.getItem("username")}`;
     LoginMessage("🎉 Login successful! Redirecting...", "green-100");
   }
 }
@@ -118,6 +130,7 @@ function logout(): void {
   
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("username");
   LoginMessage("👋 Logged out successfully. See you soon!", "green-100");
   updateUI();
 }
@@ -138,6 +151,7 @@ function loginClicked(): void {
     if (userToken) {
       window.location.reload();
       localStorage.setItem("token", userToken);
+      localStorage.setItem("username", response.data.user.username);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       updateUI();
     }
@@ -170,6 +184,7 @@ function signupClicked(): void {
       window.location.reload();
       LoginMessage("🎉 Login successful! Redirecting...", "green-100");
       localStorage.setItem("token", userToken);
+      localStorage.setItem("username", response.data.user.username)
       localStorage.setItem("user", JSON.stringify(response.data.user));
       updateUI();
     }

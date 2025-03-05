@@ -1,6 +1,13 @@
 "use strict";
 const baseUrl = "https://tarmeezacademy.com/api/v1";
 let postHtml = document.getElementById("post");
+let currentPage = 1;
+let lastPage = 1;
+window.addEventListener("scroll", function () {
+    const endOfPage = window.innerHeight + Math.round(window.scrollY) >= document.documentElement.scrollHeight - 100;
+    if (endOfPage && (currentPage <= lastPage))
+        showPosts(currentPage++);
+});
 function fillPost(post, data) {
     post.timeAgo = data.created_at;
     post.username = data.author.username;
@@ -19,9 +26,11 @@ function fillPost(post, data) {
     post.postContent = data.body;
     post.commentsNum = data.comments_count;
 }
-function showPosts() {
-    axios.get(`${baseUrl}/posts`).then((response) => {
+function showPosts(page = 1) {
+    axios.get(`${baseUrl}/posts?limit=4&page=${page}`).then((response) => {
         const posts = response.data.data;
+        lastPage = response.data.meta.last_page;
+        console.log("Last Page: " + lastPage);
         for (let post of posts) {
             let p = {};
             fillPost(p, post);
@@ -82,6 +91,7 @@ function updateUI() {
     let signupBtn = document.getElementById("signup-btn");
     let logoutBtn = document.getElementById('logout');
     let addPostBtn = document.getElementById("addBtn");
+    let navUsername = document.getElementById('nav-username');
     if (userToken === null) {
         if (loginBtn)
             loginBtn.style.display = 'block';
@@ -91,6 +101,8 @@ function updateUI() {
             logoutBtn.style.display = 'none';
         if (addPostBtn)
             addPostBtn.style.display = 'none';
+        if (navUsername)
+            navUsername.textContent = '@GUEST';
     }
     else {
         if (loginBtn)
@@ -101,12 +113,15 @@ function updateUI() {
             logoutBtn.style.display = 'block';
         if (addPostBtn)
             addPostBtn.style.display = 'block';
+        if (navUsername)
+            navUsername.textContent = `@${localStorage.getItem("username")}`;
         LoginMessage("🎉 Login successful! Redirecting...", "green-100");
     }
 }
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("username");
     LoginMessage("👋 Logged out successfully. See you soon!", "green-100");
     updateUI();
 }
@@ -124,6 +139,7 @@ function loginClicked() {
         if (userToken) {
             window.location.reload();
             localStorage.setItem("token", userToken);
+            localStorage.setItem("username", response.data.user.username);
             localStorage.setItem("user", JSON.stringify(response.data.user));
             updateUI();
         }
@@ -152,6 +168,7 @@ function signupClicked() {
             window.location.reload();
             LoginMessage("🎉 Login successful! Redirecting...", "green-100");
             localStorage.setItem("token", userToken);
+            localStorage.setItem("username", response.data.user.username);
             localStorage.setItem("user", JSON.stringify(response.data.user));
             updateUI();
         }
