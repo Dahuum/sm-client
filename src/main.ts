@@ -44,7 +44,7 @@ function showPosts(page: number = 1): void {
   axios.get(`${baseUrl}/posts?limit=4&page=${page}`).then((response) => {
     const posts = response.data.data;
     lastPage = response.data.meta.last_page;
-    console.log("Last Page: " + lastPage);
+    
     for (let post of posts) {
       let p = {} as Post;
       fillPost(p, post);
@@ -110,6 +110,7 @@ function updateUI(): void {
   let logoutBtn = document.getElementById('logout');
   let addPostBtn = document.getElementById("addBtn");
   let navUsername = document.getElementById('nav-username');
+  let navProfilePic = document.getElementById("nav-profilePic") as HTMLImageElement;
   if (userToken === null)
   {
     if (loginBtn) loginBtn.style.display = 'block';
@@ -117,6 +118,8 @@ function updateUI(): void {
     if (logoutBtn) logoutBtn.style.display = 'none';
     if (addPostBtn) addPostBtn.style.display = 'none';
     if (navUsername) navUsername.textContent = '@GUEST';
+    if (navProfilePic) navProfilePic.src = DEFAULT_PROFILE_PIC;
+    
   }
   else 
   {
@@ -125,6 +128,8 @@ function updateUI(): void {
     if (logoutBtn) logoutBtn.style.display = 'block';
     if (addPostBtn) addPostBtn.style.display = 'block';
     if (navUsername) navUsername.textContent = `@${localStorage.getItem("username")}`;
+    if (localStorage.getItem("profilePicLink") !== null) 
+      navProfilePic.src = localStorage.getItem("profilePicLink") as string;
     LoginMessage("🎉 Login successful! Redirecting...", "green-100");
   }
 }
@@ -134,6 +139,7 @@ function logout(): void {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   localStorage.removeItem("username");
+  localStorage.removeItem("profilePicLink");
   LoginMessage("👋 Logged out successfully. See you soon!", "green-100");
   updateUI();
 }
@@ -156,6 +162,8 @@ function loginClicked(): void {
       localStorage.setItem("token", userToken);
       localStorage.setItem("username", response.data.user.username);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      if (Object.keys(response.data.user.profile_image).length !== 0)
+        localStorage.setItem("profilePicLink", response.data.user.profile_image);
       updateUI();
     }
   })
@@ -168,26 +176,32 @@ function signupClicked(): void {
   let name = document.getElementById("signup-name") as HTMLInputElement;
   let mail = document.getElementById("signup-mail") as HTMLInputElement;
   let pass = document.getElementById("signup-pass") as HTMLInputElement;
+  let profilePic = document.getElementById("profilePic").files[0];
   
   console.log(name.value);
   console.log(mail.value);
   console.log(pass.value);
   
-  const register = {
-    "username": mail.value,
-    "password": pass.value,
-    "name": name.value
+  let formData = new FormData();
+  formData.append("username", mail.value);
+  formData.append("password", pass.value);
+  formData.append("name", name.value);
+  formData.append("image", profilePic);
+  
+  let header = {
+    'Content-Type': 'multipart/form-data',
   };
   let userToken: string;
   const url = `${baseUrl}/register`;
-  axios.post(url, register).then((response) => {
+  axios.post(url, formData, {headers: header}).then((response) => {
     userToken = response.data.token;
-    
     if (userToken) {
       window.location.reload();
       LoginMessage("🎉 Login successful! Redirecting...", "green-100");
       localStorage.setItem("token", userToken);
-      localStorage.setItem("username", response.data.user.username)
+      localStorage.setItem("username", response.data.user.username);
+      if (Object.keys(response.data.user.profile_image).length !== 0)
+        localStorage.setItem("profilePicLink", response.data.user.profile_image)
       localStorage.setItem("user", JSON.stringify(response.data.user));
       updateUI();
     }
@@ -199,6 +213,7 @@ function signupClicked(): void {
     if (errors.name) failed += `${errors.name[0]}<br/>`;
     if (errors.username) failed += `${errors.username}<br/>`;
     if (errors.password) failed += `${errors.password}<br/>`;
+    if (errors.image) failed += `${errors.image}`
     LoginMessage(failed, "red-400");
   })
 }
@@ -295,7 +310,7 @@ function getPostByID(ID: int): void {
               <!--  Comment -->
               <div class="w-full flex-col justify-start items-start gap-8 flex">
                   <div class="w-full pb-6 border-b border-gray-300 justify-start items-start gap-2.5 inline-flex">
-                     <img class="w-10 h-10 rounded-full object-cover"   src="${isValidImage(comment.author.profile_image) ? DEFAULT_PROFILE_PIC   : comment.author.profile_image}" />
+                     <img class="w-10 h-10 rounded-full object-cover"   src="${(Object.keys(comment.author.profile_image).length !== 0) ? comment.author.profile_image   : DEFAULT_PROFILE_PIC }" />
                       <div class="w-full flex-col justify-start items-start gap-3.5 inline-flex">
                           <div class="w-full justify-start items-start flex-col flex gap-1">
                               <div class="w-full justify-between items-start gap-1 inline-flex">
@@ -303,17 +318,9 @@ function getPostByID(ID: int): void {
                               </div>
                               <h5 id="body-of-comment" class="text-gray-800 text-sm font-normal leading-snug">${comment.body}</h5>
                           </div>
-                          <div class="justify-start items-start gap-5 inline-flex">                                            
-                              <a href="" class="w-5 h-5 flex items-center justify-center group">
-                                  <svg class="text-indigo-600 group-hover:text-indigo-800 transition-all duration-700 ease-in-out" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                      <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5835 3.16634V3.83301H1.50016C1.13197 3.83301 0.833496 4.13148 0.833496 4.49967C0.833496 4.86786 1.13197 5.16634 1.50016 5.16634L2.33356 5.16642L2.33356 11.5482C2.33354 12.6855 2.33352 13.6065 2.43103 14.3318C2.5325 15.0865 2.75042 15.7283 3.26105 16.2389C3.77168 16.7495 4.4135 16.9675 5.16821 17.0689C5.89348 17.1665 6.81445 17.1664 7.9518 17.1664H10.0486C11.186 17.1664 12.107 17.1665 12.8322 17.0689C13.5869 16.9675 14.2288 16.7495 14.7394 16.2389C15.25 15.7283 15.4679 15.0865 15.5694 14.3318C15.6669 13.6065 15.6669 12.6856 15.6669 11.5483V5.16642L16.5002 5.16634C16.8684 5.16634 17.1668 4.86786 17.1668 4.49967C17.1668 4.13148 16.8684 3.83301 16.5002 3.83301H13.4168V3.16634C13.4168 1.87768 12.3722 0.833008 11.0835 0.833008H6.91683C5.62817 0.833008 4.5835 1.87768 4.5835 3.16634ZM6.91683 2.16634C6.36455 2.16634 5.91683 2.61406 5.91683 3.16634V3.83301H12.0835V3.16634C12.0835 2.61406 11.6358 2.16634 11.0835 2.16634H6.91683ZM7.50014 7.58303C7.86833 7.58303 8.16681 7.8815 8.16681 8.24969L8.16681 12.7497C8.16681 13.1179 7.86833 13.4164 7.50014 13.4164C7.13195 13.4164 6.83348 13.1179 6.83348 12.7497L6.83348 8.24969C6.83348 7.8815 7.13195 7.58303 7.50014 7.58303ZM11.1669 8.24969C11.1669 7.8815 10.8684 7.58303 10.5002 7.58303C10.132 7.58303 9.83356 7.8815 9.83356 8.24969V12.7497C9.83356 13.1179 10.132 13.4164 10.5002 13.4164C10.8684 13.4164 11.1669 13.1179 11.1669 12.7497L11.1669 8.24969Z" fill="currentColor"/>
-                                  </svg>
-                              </a>
-                          </div>
                       </div>
       `
     }
-    console.log(response.data.data);
   })
   .catch((error) => {
     console.log(error);
@@ -323,23 +330,19 @@ getPostByID(postID);
 
 function newCommentBtnClicked(): void {
   let newComment = document.getElementById("new-comment") as HTMLInputElement;
-  let newCommentBtn = document.getElementById("new-comment-btn");
-  if (newComment.value) console.log(newComment.value);
-  else return;
-  console.log("postID: int =  " + postID);
+  if (!newComment.value) return ;
   
   const url = `${baseUrl}/posts/${postID}/comments`;
-  let param = {
-    "body": newComment
-  };
+
   const token = localStorage.getItem("token");
   const header = {
     "authorization": `Bearer ${token}`,
   };
   let formData = new FormData();
   formData.append("body", newComment.value);
+  
   axios.post(url, formData, {headers: header}).then((response) => {
-    console.log(response);
+    window.location.reload();
   })
   .catch((error) => {
     LoginMessage(error.response.data.message, "red-400");

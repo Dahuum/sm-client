@@ -65,6 +65,10 @@
                                 <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                                 <input type="password" name="password" id="signup-pass" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
                             </div>
+                            <div>
+                                <label for="img">Select image:</label>
+                                <input type="file" id="profilePic" accept="image/*" required>
+                            </div>
                             <button type="button" id="signup-button" onclick="signupClicked()" style="background-color: #047857 !important;" class="w-full text-white bg-green-500 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Create account</button>
                         </form>
                     </div>
@@ -116,7 +120,7 @@
     <nav class="fixed top-0 left-1/2 transform -translate-x-1/2  bg-green-50 dark:bg-black  sm:w-3/5 mx-auto shadow-lg rounded-b-md">
         <div class="container mx-auto flex flex-col md:flex-row items-center justify-between p-4">
             <div class="flex space-x-4">
-                <img src="https://static.vecteezy.com/system/resources/thumbnails/013/360/247/small/default-avatar-photo-icon-social-media-profile-sign-symbol-vector.jpg" class="w-7 h-7 rounded-2xl" alt="Profile pic">
+                <img id="nav-profilePic" src="https://static.vecteezy.com/system/resources/thumbnails/013/360/247/small/default-avatar-photo-icon-social-media-profile-sign-symbol-vector.jpg" class="w-7 h-7 rounded-2xl" alt="Profile pic">
                 <a id="nav-username" class="text-xl font-bold">GHEST</a>
             </div>
             <!-- Navigation Links -->
