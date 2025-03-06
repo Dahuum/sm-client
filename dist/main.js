@@ -1,6 +1,7 @@
 "use strict";
 const baseUrl = "https://tarmeezacademy.com/api/v1";
-let postHtml = document.getElementById("post");
+let postHtml = document.getElementById("posts");
+const DEFAULT_PROFILE_PIC = "https://static.vecteezy.com/system/resources/thumbnails/013/360/247/small/default-avatar-photo-icon-social-media-profile-sign-symbol-vector.jpg";
 let currentPage = 1;
 let lastPage = 1;
 window.addEventListener("scroll", function () {
@@ -26,6 +27,9 @@ function fillPost(post, data) {
     post.postContent = data.body;
     post.commentsNum = data.comments_count;
 }
+function postClicked(id) {
+    window.location.href = `./post.html?id=${id}`;
+}
 function showPosts(page = 1) {
     axios.get(`${baseUrl}/posts?limit=4&page=${page}`).then((response) => {
         const posts = response.data.data;
@@ -36,7 +40,7 @@ function showPosts(page = 1) {
             fillPost(p, post);
             let content = `
         <!-- POST -->
-        <div id="post" class="bg-green-50 rounded-lg shadow-lg h-96 mt-10">
+        <div onclick="postClicked(${post.id});" id="post" class="bg-green-50 rounded-lg shadow-lg h-96 mt-10">
             <div class="flex space-x-1 p-2 border-b-2 bg-green-50 rounded-t-lg">
                 <img src="${p.profilePic}" class="w-5 h-5 rounded-2xl ml-3" alt="Profile pic">
                 <h3 class="text-sm font-bold ">@${p.username}</h3>
@@ -189,9 +193,11 @@ function signupClicked() {
 function addPostClicked() {
     let title = document.getElementById("post-title");
     let content = document.getElementById("post-body");
+    let image = document.getElementById("post-image").files[0];
     let formData = new FormData();
     formData.append("title", title.value);
     formData.append("body", content.value);
+    formData.append("image", image);
     const token = localStorage.getItem("token");
     const header = {
         "authorization": `Bearer ${token}`,
@@ -206,6 +212,113 @@ function addPostClicked() {
     })
         .catch((error) => {
         console.log(error.response.data.message);
+        LoginMessage(error.response.data.message, "red-400");
+    });
+}
+const isValidImage = (image) => {
+    return image &&
+        image !== '' &&
+        image !== null &&
+        image !== undefined;
+};
+let postSelected = document.getElementById("postSelected");
+const urlParams = new URLSearchParams(window.location.search);
+let postID = urlParams.get('id');
+console.log("postID: int =  " + postID);
+function getPostByID(ID) {
+    axios.get(`${baseUrl}/posts/${ID}`).then((response) => {
+        let comments = response.data.data.comments;
+        let post = response.data.data;
+        let p = {};
+        fillPost(p, post);
+        postSelected === null || postSelected === void 0 ? void 0 : postSelected.innerHTML += `
+        <div class="flex space-x-1 p-2 border-b-2 bg-green-50 rounded-t-lg">
+            <img src="${p.profilePic}" class="w-5 h-5 rounded-2xl ml-3" alt="Profile pic">
+            <h3 class="text-sm font-bold ">@${p.username}</h3>
+            <h3 class="text-zinc-50 text-xs self-center  pl-2 ">${p.timeAgo}</h3>
+        </div>
+        <div class="flex justify-center items-center border-b-2  h-96 bg-green-50">
+            <img src="${p.postImage}" class=" object-cover rounded-lg h-full w-full p-1 ">
+        </div>
+        <div class="border-b-2 h-20 px-4 py-2">
+            <h3 class="text-xl font-bold text-gray-800">${p.postTitle}</h3>
+            <p class="text-sm text-gray-600 mt-1 line-clamp-2">${p.postContent}</p>                    
+        </div>
+        <div id="one-comment" class="p-8 space-y-5">
+            <!-- Comment Input Box -->
+            <div class="w-full relative flex justify-between gap-2">
+               <input id="new-comment" type="text" class="w-full py-3 px-5 rounded-lg border border-gray-300 bg-white shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] focus:outline-none text-gray-900 placeholder-gray-400 text-lg font-normal leading-relaxed" placeholder="Write comments here....">
+                    <button onclick="newCommentBtnClicked()" id="new-comment-btn" class="absolute right-6 top-1/2 transform -translate-y-1/2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 20 20" fill="none">
+                        <path
+                          d="M11.3011 8.69906L8.17808 11.8221M8.62402 12.5909L8.79264 12.8821C10.3882 15.638 11.1859 17.016 12.2575 16.9068C13.3291 16.7977 13.8326 15.2871 14.8397 12.2661L16.2842 7.93238C17.2041 5.17273 17.6641 3.79291 16.9357 3.06455C16.2073 2.33619 14.8275 2.79613 12.0679 3.71601L7.73416 5.16058C4.71311 6.16759 3.20259 6.6711 3.09342 7.7427C2.98425 8.81431 4.36221 9.61207 7.11813 11.2076L7.40938 11.3762C7.79182 11.5976 7.98303 11.7083 8.13747 11.8628C8.29191 12.0172 8.40261 12.2084 8.62402 12.5909Z"
+                          stroke="#111827" stroke-width="1.6" stroke-linecap="round" />
+                      </svg>
+                    </button>
+            </div>
+        </div>
+    `;
+        for (let comment of comments) {
+            if (comment)
+                console.log(comment);
+            if (comment)
+                console.log("comment username: " + comment.author.username);
+            if (comment)
+                console.log("comment body: " + comment.body);
+            postSelected === null || postSelected === void 0 ? void 0 : postSelected.innerHTML += `
+      <!--  Larger Comments Section -->
+      <div>
+          <div id="one-comment" class="p-8 space-y-5">
+              <!--  Comment -->
+              <div class="w-full flex-col justify-start items-start gap-8 flex">
+                  <div class="w-full pb-6 border-b border-gray-300 justify-start items-start gap-2.5 inline-flex">
+                     <img class="w-10 h-10 rounded-full object-cover"   src="${isValidImage(comment.author.profile_image) ? DEFAULT_PROFILE_PIC : comment.author.profile_image}" />
+                      <div class="w-full flex-col justify-start items-start gap-3.5 inline-flex">
+                          <div class="w-full justify-start items-start flex-col flex gap-1">
+                              <div class="w-full justify-between items-start gap-1 inline-flex">
+                                  <h5 id="who-commented" class="text-gray-900 text-sm font-semibold leading-snug">${comment.author.username}</h5>
+                              </div>
+                              <h5 id="body-of-comment" class="text-gray-800 text-sm font-normal leading-snug">${comment.body}</h5>
+                          </div>
+                          <div class="justify-start items-start gap-5 inline-flex">                                            
+                              <a href="" class="w-5 h-5 flex items-center justify-center group">
+                                  <svg class="text-indigo-600 group-hover:text-indigo-800 transition-all duration-700 ease-in-out" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                      <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5835 3.16634V3.83301H1.50016C1.13197 3.83301 0.833496 4.13148 0.833496 4.49967C0.833496 4.86786 1.13197 5.16634 1.50016 5.16634L2.33356 5.16642L2.33356 11.5482C2.33354 12.6855 2.33352 13.6065 2.43103 14.3318C2.5325 15.0865 2.75042 15.7283 3.26105 16.2389C3.77168 16.7495 4.4135 16.9675 5.16821 17.0689C5.89348 17.1665 6.81445 17.1664 7.9518 17.1664H10.0486C11.186 17.1664 12.107 17.1665 12.8322 17.0689C13.5869 16.9675 14.2288 16.7495 14.7394 16.2389C15.25 15.7283 15.4679 15.0865 15.5694 14.3318C15.6669 13.6065 15.6669 12.6856 15.6669 11.5483V5.16642L16.5002 5.16634C16.8684 5.16634 17.1668 4.86786 17.1668 4.49967C17.1668 4.13148 16.8684 3.83301 16.5002 3.83301H13.4168V3.16634C13.4168 1.87768 12.3722 0.833008 11.0835 0.833008H6.91683C5.62817 0.833008 4.5835 1.87768 4.5835 3.16634ZM6.91683 2.16634C6.36455 2.16634 5.91683 2.61406 5.91683 3.16634V3.83301H12.0835V3.16634C12.0835 2.61406 11.6358 2.16634 11.0835 2.16634H6.91683ZM7.50014 7.58303C7.86833 7.58303 8.16681 7.8815 8.16681 8.24969L8.16681 12.7497C8.16681 13.1179 7.86833 13.4164 7.50014 13.4164C7.13195 13.4164 6.83348 13.1179 6.83348 12.7497L6.83348 8.24969C6.83348 7.8815 7.13195 7.58303 7.50014 7.58303ZM11.1669 8.24969C11.1669 7.8815 10.8684 7.58303 10.5002 7.58303C10.132 7.58303 9.83356 7.8815 9.83356 8.24969V12.7497C9.83356 13.1179 10.132 13.4164 10.5002 13.4164C10.8684 13.4164 11.1669 13.1179 11.1669 12.7497L11.1669 8.24969Z" fill="currentColor"/>
+                                  </svg>
+                              </a>
+                          </div>
+                      </div>
+      `;
+        }
+        console.log(response.data.data);
+    })
+        .catch((error) => {
+        console.log(error);
+    });
+}
+getPostByID(postID);
+function newCommentBtnClicked() {
+    let newComment = document.getElementById("new-comment");
+    let newCommentBtn = document.getElementById("new-comment-btn");
+    if (newComment.value)
+        console.log(newComment.value);
+    else
+        return;
+    console.log("postID: int =  " + postID);
+    const url = `${baseUrl}/posts/${postID}/comments`;
+    let param = {
+        "body": newComment
+    };
+    const token = localStorage.getItem("token");
+    const header = {
+        "authorization": `Bearer ${token}`,
+    };
+    let formData = new FormData();
+    formData.append("body", newComment.value);
+    axios.post(url, formData, { headers: header }).then((response) => {
+        console.log(response);
+    })
+        .catch((error) => {
         LoginMessage(error.response.data.message, "red-400");
     });
 }
