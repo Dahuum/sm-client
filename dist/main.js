@@ -230,16 +230,9 @@ function addPostClicked() {
         LoginMessage(error.response.data.message, "red-400");
     });
 }
-const isValidImage = (image) => {
-    return image &&
-        image !== '' &&
-        image !== null &&
-        image !== undefined;
-};
 let postSelected = document.getElementById("postSelected");
 const urlParams = new URLSearchParams(window.location.search);
 let postID = urlParams.get('id');
-console.log("postID: int =  " + postID);
 function getPostByID(ID) {
     axios.get(`${baseUrl}/posts/${ID}`).then((response) => {
         let comments = response.data.data.comments;

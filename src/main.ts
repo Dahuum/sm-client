@@ -248,21 +248,13 @@ function addPostClicked(): void {
     })
 }
 
-const isValidImage = (image: any): boolean => {
-    return image && 
-           image !== '' && 
-           image !== null && 
-           image !== undefined;
-}
+
 /* POST PAGE SECTION */
 
 let postSelected = document.getElementById("postSelected");
-
-
 /* post id to comment in the right post */
 const urlParams = new URLSearchParams(window.location.search);
 let postID: int = urlParams.get('id');
-console.log("postID: int =  " + postID);
 
 function getPostByID(ID: int): void {
   axios.get(`${baseUrl}/posts/${ID}`).then((response) => {
