@@ -46,11 +46,18 @@ function showPosts(page = 1) {
                 <h3 class="text-sm font-bold">@${p.username}</h3>
                 <h3 class="text-zinc-50 text-xs self-center pl-2">${p.timeAgo}</h3>
               </div>
-              <button onclick="editPostClicked(${post.id});" class="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors duration-200">
+              <div>
+              <button id="deleteBTN" onclick="deletePost(${post.id});" class="mr-2 p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <button id="editBTN"  data-modal-target="editPost" data-modal-toggle="editPost" onclick="editPostClicked(${post.id});"  class="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </button>
+              </div>
             </div>
             <div class="flex justify-center items-center border-b-2  h-96 bg-green-50">
                 <img src="${p.postImage}" class=" object-cover rounded-lg h-full w-full p-1 ">
@@ -71,6 +78,12 @@ function showPosts(page = 1) {
         `;
             if (postHtml)
                 postHtml.innerHTML += content;
+        }
+        if (typeof window.initFlowbite === 'function') {
+            window.initFlowbite();
+        }
+        else {
+            console.error('Flowbite not found. Make sure it is properly loaded.');
         }
     });
 }
@@ -103,6 +116,8 @@ function updateUI() {
     let addPostBtn = document.getElementById("addBtn");
     let navUsername = document.getElementById('nav-username');
     let navProfilePic = document.getElementById("nav-profilePic");
+    let editBTN = document.getElementById("editBTN");
+    let deleteBTN = document.getElementById("deleteBTN");
     if (userToken === null) {
         if (loginBtn)
             loginBtn.style.display = 'block';
@@ -114,6 +129,10 @@ function updateUI() {
             addPostBtn.style.display = 'none';
         if (navUsername)
             navUsername.textContent = '@GUEST';
+        if (editBTN)
+            editBTN.style.display = 'none';
+        if (deleteBTN)
+            deleteBTN.style.display = 'none';
         if (navProfilePic)
             navProfilePic.src = DEFAULT_PROFILE_PIC;
     }
@@ -126,6 +145,10 @@ function updateUI() {
             logoutBtn.style.display = 'block';
         if (addPostBtn)
             addPostBtn.style.display = 'block';
+        if (editBTN)
+            editBTN.style.display = 'block';
+        if (deleteBTN)
+            deleteBTN.style.display = 'block';
         if (navUsername)
             navUsername.textContent = `@${localStorage.getItem("username")}`;
         if (localStorage.getItem("profilePicLink") !== null)
@@ -238,7 +261,60 @@ function addPostClicked() {
     });
 }
 function editPostClicked(ID) {
+    window.history.pushState({ id: ID }, '', `?id=${ID}`);
+    let title = document.getElementById("old-post-title");
+    let body = document.getElementById("old-post-body");
+    title.innerHTML = "hello";
     console.log("Edit Post Clicked With ID: " + ID);
+    axios.get(`${baseUrl}/posts/${ID}`).then((response) => {
+        let post = response.data.data;
+        console.log(title);
+        title.value = post.title;
+        body.value = post.body;
+        console.log(post);
+    });
+}
+function editPost() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let postID = urlParams.get("id");
+    urlParams.delete("id");
+    let title = document.getElementById("old-post-title");
+    let body = document.getElementById("old-post-body");
+    let param = {
+        "title": title.value,
+        "body": body.value,
+    };
+    const token = localStorage.getItem("token");
+    const header = {
+        "authorization": `Bearer ${token}`,
+    };
+    axios.put(`${baseUrl}/posts/${postID}`, param, { headers: header }).then((response) => {
+        setTimeout(() => {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.delete("id");
+            window.history.pushState({}, '', newUrl.toString());
+            window.location.href = newUrl.toString();
+        }, 1000);
+        LoginMessage("Post edited successfully!", "green-100");
+    })
+        .catch((error) => {
+        LoginMessage(error.response.data.error_message, "red-400");
+    });
+}
+function deletePost(ID) {
+    const token = localStorage.getItem("token");
+    const header = {
+        "authorization": `Bearer ${token}`,
+    };
+    axios.delete(`${baseUrl}/posts/${ID}`, { headers: header }).then((response) => {
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+        LoginMessage("Post deleted successfully!", "red-100");
+    })
+        .catch((error) => {
+        LoginMessage(error.response.data.error_message, "red-400");
+    });
 }
 let postSelected = document.getElementById("postSelected");
 const urlParams = new URLSearchParams(window.location.search);
@@ -277,12 +353,6 @@ function getPostByID(ID) {
         </div>
     `;
         for (let comment of comments) {
-            if (comment)
-                console.log(comment);
-            if (comment)
-                console.log("comment username: " + comment.author.username);
-            if (comment)
-                console.log("comment body: " + comment.body);
             postSelected === null || postSelected === void 0 ? void 0 : postSelected.innerHTML += `
       <!--  Larger Comments Section -->
       <div>
@@ -303,7 +373,7 @@ function getPostByID(ID) {
         }
     })
         .catch((error) => {
-        console.log(error);
+        console.log("there is an error");
     });
 }
 getPostByID(postID);

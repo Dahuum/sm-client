@@ -104,6 +104,30 @@
             </div>
         </div>
         <!--// Add New Post //-->
+        
+        <!-- Edit Old Post -->
+        <div id="editPost" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-md max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                    <!-- Modal body -->
+                    <div class="p-4 md:p-5">
+                        <form class="space-y-4" action="#">
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title Of The OLD Post</label>
+                                <input id="old-post-title" type="text"  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="@old-post-title" required />
+                            </div>
+                            <div>
+                                <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Body Of The Post</label>
+                                <textarea id="old-post-body" class="h-48 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="@old-post-content" required></textarea>
+                            </div>
+                            <button type="button" onclick="editPost();" id="editBtn" style="background-color: #047857 !important;" class="w-full text-white bg-green-500 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">EDIT</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--// Edit Old Post //-->
     <!--// Modals //-->
     
     <!-- Alerts -->
