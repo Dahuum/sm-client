@@ -145,7 +145,7 @@
         <div class="container mx-auto flex flex-col md:flex-row items-center justify-between p-4">
             <div class="flex space-x-4">
                 <img id="nav-profilePic" src="https://static.vecteezy.com/system/resources/thumbnails/013/360/247/small/default-avatar-photo-icon-social-media-profile-sign-symbol-vector.jpg" class="w-7 h-7 rounded-2xl" alt="Profile pic">
-                <button onclick="goToProfile(localStorage.getItem('id'))" id="nav-username" class="text-xl font-bold">GHEST</button>
+                <button onclick="goToProfile(localStorage.getItem('id'));" id="nav-username" class="text-xl font-bold">GHEST</button>
             </div>
             <!-- Navigation Links -->
             <ul class="flex space-x-6 mt-2 md:mt-0">
@@ -171,15 +171,55 @@
     <!--// NavBar //-->
     
     <!-- MAIN CONTENT -->
-    <div class=" right sm:container sm:w-3/5 mx-auto min-h-screen  mt-24">
-        <!-- POSTS -->
-        <div id="posts">
+    <div id="mainContent" class=" right sm:container sm:w-3/5 mx-auto min-h-screen  mt-24">
+        <!-- <div class="mx-2 my-10 rounded-xl border bg-white px-4 shadow-md sm:mx-auto sm:max-w-xl sm:px-8">
+          <div class="mb-2 flex flex-col gap-y-6 border-b py-8 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center">
+              <img class="h-14 w-14 rounded-full object-cover" src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" alt="Simon Lewis" />
+              <div class="ml-4 w-56">
+                <p class="text-slate-800 text-xl font-extrabold">name</p>
+                <p class="text-slate-500">@username</p>
+              </div>
+            </div>
+            <div class="flex flex-col items-center">
+              <p class="text-slate-700 mb-1 text-xl font-extrabold">25</p>
+              <p class="text-slate-500 text-sm font-medium">Posts</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <p class="text-slate-700 mb-1 text-xl font-extrabold">3</p>
+              <p class="text-slate-500 text-sm font-medium">Comments</p>
+            </div>
+          </div>
+          <div class="mb-2 flex justify-between  py-8 text-sm sm:text-base">
+            <div class="flex flex-col space-y-3">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span class="text-slate-700">richard.hendricks@piedpiper.com</span>
+              </div>
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="text-slate-700">@richardhendricks</span>
+              </div>
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-slate-700">Richard Hendricks</span>
+              </div>
+            </div>
+          </div>
+        </div> -->
+        
+        <div id="UserPost">
             
             <!-- POST -->
             <!-- <div id="post" class="blur-lg bg-green-50 rounded-lg shadow-lg h-96 mt-10"></div> -->
             <!--// POST //-->
         </div>
-        <!--// POSTS //-->   
     </div>    
     <!-- MAIN CONTENT -->
 

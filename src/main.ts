@@ -168,6 +168,7 @@ function logout(): void {
   localStorage.removeItem("user");
   localStorage.removeItem("username");
   localStorage.removeItem("profilePicLink");
+  localStorage.removeItem("id");
   LoginMessage("👋 Logged out successfully. See you soon!", "green-100");
   updateUI();
 }
@@ -190,6 +191,7 @@ function loginClicked(): void {
       localStorage.setItem("token", userToken);
       localStorage.setItem("username", response.data.user.username);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("id", response.data.user.id);
       if (Object.keys(response.data.user.profile_image).length !== 0)
         localStorage.setItem("profilePicLink", response.data.user.profile_image);
       updateUI();
@@ -228,6 +230,7 @@ function signupClicked(): void {
       LoginMessage("🎉 Login successful! Redirecting...", "green-100");
       localStorage.setItem("token", userToken);
       localStorage.setItem("username", response.data.user.username);
+      localStorage.setItem("id", response.data.user.id);
       if (Object.keys(response.data.user.profile_image).length !== 0)
         localStorage.setItem("profilePicLink", response.data.user.profile_image)
       localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -343,6 +346,80 @@ function deletePost(ID: int): void {
     LoginMessage(error.response.data.error_message, "red-400");
   })
 }
+
+function goToProfile(id: int): void {
+  window.location.href = `./profile.html?id=${id}`;
+}
+
+function getProfileByID(id: int): void {
+  window.location.href = "./profile.html";
+
+  let userPost = document.getElementById("UserPost");
+  let mainContent = document.getElementById("mainContent");
+  
+  axios.get(`${baseUrl}/users/${id}`).then((response) => {
+    console.log(response.data.data);
+    mainContent?.innerHTML += `
+    <div class="mx-2 my-10 rounded-xl border bg-white px-4 shadow-md sm:mx-auto sm:max-w-xl sm:px-8">
+      <div class="mb-2 flex flex-col gap-y-6 border-b py-8 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center">
+          <img class="h-14 w-14 rounded-full object-cover" src="${response.data.data.profile_image || DEFAULT_PROFILE_PIC}"/>
+          <div class="ml-4 w-56">
+            <p class="text-slate-800 text-xl font-extrabold">@${response.data.data.username}</p>
+            <p class="text-slate-500">${response.data.data.name}</p>
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <p class="text-slate-700 mb-1 text-xl font-extrabold">${response.data.data.posts_count}</p>
+          <p class="text-slate-500 text-sm font-medium">Posts</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <p class="text-slate-700 mb-1 text-xl font-extrabold">${response.data.data.comments_count}</p>
+          <p class="text-slate-500 text-sm font-medium">Comments</p>
+        </div>
+      </div>
+      <div class="mb-2 flex justify-between  py-8 text-sm sm:text-base">
+        <div class="flex flex-col space-y-3">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span class="text-slate-700">${response.data.data.email || "---------"}</span>
+          </div>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span class="text-slate-700">@${response.data.data.username}</span>
+          </div>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-slate-700">${response.data.data.name}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    `
+  })
+  .catch((error) => {
+    console.log(error);
+  })
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Extract ID from URL when page loads
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get('id');
+  console.log("user id: " userId);
+  if (userId) {
+    getProfileByID(Number(userId));
+  } else {
+    console.error("No user ID provided in URL");
+  }
+});
+// document.addEventListener('DOMContentLoaded', getProfileByID);
 /* POST PAGE SECTION */
 
 let postSelected = document.getElementById("postSelected");
