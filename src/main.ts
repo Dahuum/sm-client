@@ -57,7 +57,7 @@ function showPosts(page: number = 1): void {
                 <h3 class="text-sm font-bold">@${p.username}</h3>
                 <h3 class="text-zinc-50 text-xs self-center pl-2">${p.timeAgo}</h3>
               </div>
-              <button class="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors duration-200">
+              <button onclick="editPostClicked(${post.id});" class="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
@@ -253,6 +253,10 @@ function addPostClicked(): void {
       console.log(error.response.data.message);
       LoginMessage(error.response.data.message, "red-400");
     })
+}
+
+function editPostClicked(ID: int): void {
+  console.log("Edit Post Clicked With ID: " + ID);
 }
 
 
