@@ -25,6 +25,10 @@ window.addEventListener("scroll", function(){
 })
 /* // HANDLE INFINITE SCROLLING // */
 
+function goToHomePage(): void {
+  window.location.href = "./";
+}
+
 function fillPost(post: Post, data: any): void{
   post.timeAgo = data.created_at;
   post.username = data.author.username;
@@ -56,7 +60,7 @@ function showPosts(page: number = 1): void {
             <div class="flex items-center justify-between p-2 border-b-2 bg-green-50 rounded-t-lg">
               <div class="flex items-center space-x-1">
                 <img src="${p.profilePic}" class="w-5 h-5 rounded-2xl ml-3" alt="Profile pic">
-                <h3 class="text-sm font-bold">@${p.username}</h3>
+                <button  onclick="goToProfile(${post.author.id})" class="text-sm font-bold">@${p.username}</button>
                 <h3 class="text-zinc-50 text-xs self-center pl-2">${p.timeAgo}</h3>
               </div>
               <div>
@@ -163,7 +167,6 @@ function updateUI(): void {
 }
 
 function logout(): void {
-  
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   localStorage.removeItem("username");
@@ -348,17 +351,16 @@ function deletePost(ID: int): void {
 }
 
 function goToProfile(id: int): void {
-  window.location.href = `./profile.html?id=${id}`;
+  window.location.href = `./profile.html?profileID=${id}`;
 }
 
 function getProfileByID(id: int): void {
-  window.location.href = "./profile.html";
-
-  let userPost = document.getElementById("UserPost");
+  // let userPost = document.getElementById("UserPost");
   let mainContent = document.getElementById("mainContent");
   
+  /* get profile infos, name, username ... */
   axios.get(`${baseUrl}/users/${id}`).then((response) => {
-    console.log(response.data.data);
+    // console.log(response.data.data);
     mainContent?.innerHTML += `
     <div class="mx-2 my-10 rounded-xl border bg-white px-4 shadow-md sm:mx-auto sm:max-w-xl sm:px-8">
       <div class="mb-2 flex flex-col gap-y-6 border-b py-8 sm:flex-row sm:items-center sm:justify-between">
@@ -406,13 +408,71 @@ function getProfileByID(id: int): void {
   .catch((error) => {
     console.log(error);
   })
+  /* get profile infos, name, username ... */
+
+  /* get profile posts */
+  axios.get(`${baseUrl}/users/${id}/posts`).then((response) => {
+    let userPosts = response.data.data;
+    console.log("hello world");
+    console.log (userPosts);
+    
+    for (let post of userPosts) {
+      let p = {} as Post;
+      fillPost(p, post);
+      console.log("inside loop");
+      console.log(p);
+      let content = `
+        <!-- POST -->
+        <div id="post" class="bg-green-50 rounded-lg shadow-lg h-96 mt-16">
+            <div class="flex items-center justify-between p-2 border-b-2 bg-green-50 rounded-t-lg">
+              <div class="flex items-center space-x-1">
+                <img src="${p.profilePic}" class="w-5 h-5 rounded-2xl ml-3" alt="Profile pic">
+                <button onclick="goToProfile(${post.author.id})" class="text-sm font-bold">@${p.username}</button>
+                <h3 class="text-zinc-50 text-xs self-center pl-2">${p.timeAgo}</h3>
+              </div>
+              <div>
+              <button id="deleteBTN" onclick="deletePost(${post.id});" class="mr-2 p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <button id="editBTN"  data-modal-target="editPost" data-modal-toggle="editPost" onclick="editPostClicked(${post.id});"  class="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+              </div>
+            </div>
+            <div class="flex justify-center items-center border-b-2  h-96 bg-green-50">
+                <img src="${p.postImage}" class=" object-cover rounded-lg h-full w-full p-1 ">
+            </div>
+            <div class="border-b-2 h-20 px-4 py-2">
+                <h3 class="text-xl font-bold text-gray-800">${p.postTitle}</h3>
+                <p class="text-sm text-gray-600 mt-1 line-clamp-2">${p.postContent}</p>                    
+            </div>
+            <!--  Larger Comments Button -->
+            <button onclick="postClicked(${post.id});" class="w-full py-4 bg-green-500 hover:bg-green-600 text-gray-800 rounded-b-lg shadow-lg transition-colors duration-300 flex items-center justify-center space-x-2 ">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-semibold">View Comments (${p.commentsNum})</span>
+              </button>
+        </div>
+        <!--// POST //-->
+        `;
+      mainContent.innerHTML += content;
+    }
+  }).catch((error) => {
+    console.log(error);
+  });
+  /* get profile posts */
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Extract ID from URL when page loads
   const urlParams = new URLSearchParams(window.location.search);
-  const userId = urlParams.get('id');
-  console.log("user id: " userId);
+    const userId = urlParams.get('profileID');
+  console.log("user id: " + userId);
   if (userId) {
     getProfileByID(Number(userId));
   } else {
@@ -437,7 +497,7 @@ function getPostByID(ID: int): void {
     postSelected?.innerHTML += `
         <div class="flex space-x-1 p-2 border-b-2 bg-green-50 rounded-t-lg">
             <img src="${p.profilePic}" class="w-5 h-5 rounded-2xl ml-3" alt="Profile pic">
-            <h3 class="text-sm font-bold ">@${p.username}</h3>
+            <button onclick="goToProfile(${post.author.id})" class="text-sm font-bold ">@${p.username}</button>
             <h3 class="text-zinc-50 text-xs self-center  pl-2 ">${p.timeAgo}</h3>
         </div>
         <div class="flex justify-center items-center border-b-2  h-96 bg-green-50">
